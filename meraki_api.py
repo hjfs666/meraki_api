@@ -14,20 +14,22 @@ headers = {
 def get_organizations():
     url = f'{BASE_URL}/organizations'
     response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f'Error: {response.status_code}')
-        return None
+    response.raise_for_status()  # Validar la respuesta
+    return response.json()
 
 # Llamada a la función y muestra de resultados
 def list_organizations():
-    organizations = get_organizations()
-    if organizations:
-        for org in organizations:
-            print(f'ID: {org["id"]}, Nombre: {org["name"]}')
-    else:
-        print('No se pudieron obtener las organizaciones.')
+    try:
+        organizations = get_organizations()
+        if organizations:
+            for org in organizations:
+                print(f'ID: {org["id"]}, Nombre: {org["name"]}')
+        else:
+            print('No se pudieron obtener las organizaciones.')
+    except requests.exceptions.HTTPError as err:
+        print(f'Error en la solicitud: {err}')
+    except Exception as e:
+        print(f'Ocurrió un error: {e}')
 
 # Ejecutar la función para listar las organizaciones
 list_organizations()
